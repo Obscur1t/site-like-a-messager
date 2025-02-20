@@ -13,22 +13,25 @@ const saveUserNameToLocalStorage = () => {
 }
 
 const getUserName = () => {
-    if (userName === 'User') {
+    if (userName === 'User' || userName === null) {
         userName = sendMessageUserName.value.trim() || 'User';
         saveUserNameToLocalStorage();
     } else {
         sendMessageUserName.style.display = 'none';
+        sendMessageUserName.removeAttribute('required')
     }
      
 }
 
 if (userName === 'User') {
     sendMessageUserName.style.display = 'block';
+    sendMessageUserName.setAttribute('required', '');
 }
 
 const renderMessages = () => {
     messageContainer.innerHTML = '';
-    messages.forEach(message => {
+    const copyMessages = [...messages]
+    copyMessages.reverse().forEach(message => {
         const messageWrapper = document.createElement('div');
         messageWrapper.className = 'message-wrapper';
 
@@ -57,7 +60,10 @@ const renderMessages = () => {
     });
 }
 
-sendMessageBtn.addEventListener('click', () => addMessages())
+sendMessageForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    addMessages();
+});
 
 const cleanupOldMessages = async () => {
     try {
@@ -96,22 +102,23 @@ const addMessages = async () => {
 
         const message = sendMessageInput.value.trim();
         if (message) {
-            const response = await fetch(MOCK_API_URL, {
+            await fetch(MOCK_API_URL, {
                 method: 'POST',
                 body: JSON.stringify({
                     createdAt: new Date().toISOString(),
-                    name: localStorage.getItem('user-name'),
+                    name: JSON.stringify(userName),
                     message: sendMessageInput.value,
                 }),
                 headers: {
                     'Content-type': 'application/json',
                 }
             })
-            const newMessage = await response.json();
-            messages.push(newMessage);
+            await getMessages();
             
     
-            renderMessages();
+            if (message) {
+                sendMessageInput.value = ''; 
+            }
         }
 
     } catch (error) {
@@ -134,4 +141,4 @@ const getMessages = async () => {
 
 
 getMessages();
-
+setInterval(getMessages, 5000);
