@@ -41,19 +41,23 @@ const renderMessages = () => {
         const userName = document.createElement('h2');
         userName.className = 'message-user-name';
         userName.textContent = JSON.parse(message.name);
+        
+        const userTag = document.createElement('h2');
+        userTag.className = 'message-user-tag';
+        userTag.textContent = `@${JSON.parse(message.name)}`.toLocaleLowerCase();
 
         const messageCreatedAt = document.createElement('p');
         messageCreatedAt.className = 'message-created-at';
         messageCreatedAt.textContent = `${new Date(Date.parse(message.createdAt)).toLocaleDateString('en-US', {
             hour: 'numeric',
             minute: 'numeric',
-        })}`
+        })}`;
 
         const messageContent = document.createElement('p');
         messageContent.className = 'message-content';
         messageContent.textContent = message.message;
 
-        messageInfo.append(userName, messageCreatedAt);
+        messageInfo.append(userName, userTag ,messageCreatedAt);
         messageWrapper.append(messageInfo, messageContent);
 
         messageContainer.append(messageWrapper);
